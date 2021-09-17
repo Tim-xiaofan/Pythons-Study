@@ -7,6 +7,7 @@ G = nx.DiGraph()
 
 def av2list(av):
     count = len(av) -1
+    print("count:", count)
     if(count % 2 != 0):
         print("invalid edges")
         exit(1)
