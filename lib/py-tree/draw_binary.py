@@ -1,32 +1,49 @@
+#!/usr/bin/python3
 import networkx as nx
 from networkx.drawing.nx_agraph import graphviz_layout
 import matplotlib.pyplot as plt
 import sys
+import argparse
 
-G = nx.DiGraph()
+class MyParser(argparse.ArgumentParser):
+        def error(self, message):
+            print(message)
+            self.print_help()
+            print("example : ", self.prog, " -edges \"(C,B) (C,D) (B,A) (D,E)\"\t")
+            exit(2)
 
-def av2list(av):
-    count = len(av) -1
-    print("count:", count)
-    if(count % 2 != 0):
-        print("invalid edges")
-        exit(1)
-    #for x in av:
-    #    print(x)
+def get_option():
+    parser = MyParser(description='draw a tree accordding to edges')
+    parser.add_argument('-e', '--edges', metavar='edges', required=True, 
+                        dest='edges',help='edges of the tree')
+    parser.add_argument('-i', '--image', metavar='image', required=False, 
+                        dest='image',help='image file name, defall is \"tree.png\"')
+    args = parser.parse_args()
+    return args
+
+def edge2tuple(e):
+    e = e.replace("(", "")
+    e = e.replace(")", "")
+    e = e.replace(",", "")
+    e = e.replace(" ", "")
+    #print("e:", e)
+    return (e[0], e[1])
+    
+#av = (C,B) (C,D) (B,A) (D,E)
+def av2list(edges):
+    temp = edges.split()
     elist = []
-    i = 1
-    while i < count:
-        elist.append((av[i], av[i+1]))
-        i = i + 2
-    #print("elist : ", elist)
+    for i in temp:
+        elist.append(edge2tuple(i))
     return elist
 
 def main():
-    elist = av2list(sys.argv)
+    args = get_option()
+    G = nx.DiGraph()
+    elist = av2list(args.edges)
     #elist = [(1, 2), (1, 3), (2, 4), (2, 5), (3, 6), (3, 7)]
     print("elist : ", elist)
-    G.add_edges_from(elist)
-    
+    G.add_edges_from(elist) 
     # write dot file to use with graphviz
     # run "dot -Tpng test.dot >test.png"
     #nx.nx_agraph.write_dot(G,'test.dot')
@@ -34,7 +51,7 @@ def main():
     plt.title('draw_networkx')
     pos=graphviz_layout(G, prog='dot')
     nx.draw(G, pos, with_labels=True, arrows=False)
-    plt.savefig("bitree.png")
+    plt.savefig("tree.png")
     plt.show()
 if __name__ == "__main__":
     main()
