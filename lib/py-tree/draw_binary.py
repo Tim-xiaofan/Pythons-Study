@@ -4,12 +4,14 @@ from networkx.drawing.nx_agraph import graphviz_layout
 import matplotlib.pyplot as plt
 import sys
 import argparse
+import matplotlib
+matplotlib.use('TkAgg')
 
 class MyParser(argparse.ArgumentParser):
         def error(self, message):
             print(message)
             self.print_help()
-            print("example : ", self.prog, " -edges \"(C,B) (C,D) (B,A) (D,E)\"\t")
+            print("example : ./{}".format(self.prog), " --edges \"(C,B) (C,D) (B,A) (D,E)\"\t")
             exit(2)
 
 def get_option():
@@ -24,8 +26,8 @@ def get_option():
 def edge2tuple(e):
     e = e.replace("(", "")
     e = e.replace(")", "")
-    e = e.replace(",", "")
     e = e.replace(" ", "")
+    e = e.split(',')
     #print("e:", e)
     return (e[0], e[1])
     
